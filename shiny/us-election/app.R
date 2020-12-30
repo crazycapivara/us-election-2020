@@ -5,7 +5,7 @@ library(leaflet)
 library(ggplot2)
 
 us_states <- readRDS("data/us-states.rds") %>%
-    mutate(biden = 0L, trump = 0L)
+    mutate(biden = 0, trump = 0)
 
 .appv <- reactiveValues(us_states = us_states)
 
@@ -14,10 +14,11 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             selectInput("state", "State", choices = us_states$state_name)
+            #, sliderInput("test", "test", 0, 100, 0, step = 0.1)
             , textInput("biden", "Biden", value = 0)
             , textInput("trump", "Trump", value = 0)
             , actionButton("update", "Update")
-            , plotOutput("barplot")
+            #, plotOutput("barplot")
         ),
         mainPanel(
            leafletOutput("map")
@@ -48,20 +49,14 @@ server <- function(input, output, session) {
     }) 
     
     observeEvent(input$map_shape_click, {
-        # print(input$map_shape_click)
         state <- input$map_shape_click$id
-        #x <- .appv$us_states %>%
-        #    filter(state_name == state)
-        #print(x)
         updateSelectInput(session, "state", selected = state)
-        #updateTextInput(session, "biden", value = x$biden)
-        #updateTextInput(session, "trump", value = x$trump)
         print(.appv$us_states)
     })
     
     observeEvent(input$update, {
-        biden <- as.integer(input$biden)
-        trump <- as.integer(input$trump)
+        biden <- as.numeric(input$biden)
+        trump <- as.numeric(input$trump)
         state <- input$state
         print(biden)
         print(trump)
@@ -69,13 +64,13 @@ server <- function(input, output, session) {
         .appv$us_states[.appv$us_states$state_name == state, c("biden", "trump")] <- c(biden, trump)
     })
     
-    output$barplot <- renderPlot({
-        votes <- c(sum(.appv$us_states$biden), sum(.appv$us_states$trump))
-        x <- tibble(name = c("biden", "trump"), votes = votes)
-        ggplot(data = x, aes(x = name, y = votes)) +
-            geom_bar(stat = "identity", fill = c("blue", "red")) +
-            theme_minimal()
-    })
+    #output$barplot <- renderPlot({
+    #    votes <- c(sum(.appv$us_states$biden), sum(.appv$us_states$trump))
+    #    x <- tibble(name = c("biden", "trump"), votes = votes)
+    #    ggplot(data = x, aes(x = name, y = votes)) +
+    #        geom_bar(stat = "identity", fill = c("blue", "red")) +
+    #        theme_minimal()
+    #})
     
     output$overview <- renderTable({
         x <- .appv$us_states
