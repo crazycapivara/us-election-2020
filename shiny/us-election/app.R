@@ -2,6 +2,7 @@ library(shiny)
 library(dplyr)
 library(tibble)
 library(leaflet)
+library(ggplot2)
 
 us_states <- readRDS("data/us-states.rds") %>%
     mutate(biden = 0L, trump = 0L)
@@ -20,6 +21,7 @@ ui <- fluidPage(
         ),
         mainPanel(
            leafletOutput("map")
+           , tableOutput("overview")
         )
     )
 )
@@ -73,6 +75,18 @@ server <- function(input, output, session) {
         ggplot(data = x, aes(x = name, y = votes)) +
             geom_bar(stat = "identity", fill = c("blue", "red")) +
             theme_minimal()
+    })
+    
+    output$overview <- renderTable({
+        x <- .appv$us_states
+        #x$geometry <- NULL
+        tibble(
+            State = x$state_name,
+            Votes = x$number_of_votes,
+            `Biden %` = x$biden,
+            `Trump %` = x$trump
+        )
+        #x
     })
 }
 
