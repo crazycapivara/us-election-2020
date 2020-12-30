@@ -7,7 +7,10 @@ library(ggplot2)
 us_states <- readRDS("data/us-states.rds") %>%
     mutate(biden = 0, trump = 0)
 
-.appv <- reactiveValues(us_states = us_states)
+.appv <- reactiveValues(
+    us_states = us_states
+    , votes = tibble(Biden = 0L, Trump = 0L)
+)
 
 ui <- fluidPage(
     titlePanel("US Election"),
@@ -15,13 +18,14 @@ ui <- fluidPage(
         sidebarPanel(
             selectInput("state", "State", choices = us_states$state_name)
             #, sliderInput("test", "test", 0, 100, 0, step = 0.1)
-            , textInput("biden", "Biden", value = 0)
-            , textInput("trump", "Trump", value = 0)
+            , textInput("biden", "Biden %", value = 0)
+            , textInput("trump", "Trump %", value = 0)
             , actionButton("update", "Update")
             #, plotOutput("barplot")
         ),
         mainPanel(
            leafletOutput("map")
+           , tableOutput("votes")
            , tableOutput("overview")
         )
     )
@@ -62,6 +66,9 @@ server <- function(input, output, session) {
         print(trump)
         print(state)
         .appv$us_states[.appv$us_states$state_name == state, c("biden", "trump")] <- c(biden, trump)
+        .appv$votes$Biden <- filter(.appv$us_states, biden > trump)$number_of_votes %>% sum()
+        .appv$votes$Trump <- filter(.appv$us_states, trump > biden)$number_of_votes %>% sum()
+        #print(votes_biden)
     })
     
     #output$barplot <- renderPlot({
@@ -71,6 +78,10 @@ server <- function(input, output, session) {
     #        geom_bar(stat = "identity", fill = c("blue", "red")) +
     #        theme_minimal()
     #})
+    
+    output$votes <- renderTable({
+        .appv$votes
+    })
     
     output$overview <- renderTable({
         x <- .appv$us_states
