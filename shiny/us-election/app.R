@@ -5,7 +5,7 @@ library(leaflet)
 library(ggplot2)
 
 us_states <- readRDS("data/us-states.rds") %>%
-    mutate(biden = 0, trump = 0)
+    mutate(biden = 0, trump = 0, color = "grey")
 
 .appv <- reactiveValues(
     us_states = us_states
@@ -39,7 +39,7 @@ server <- function(input, output, session) {
                 data = us_states,
                 weight = 1,
                 color = "white",
-                fillColor = "blue"
+                fillColor = ~ color
                 , layerId = ~ state_name
                 #, popup = ~ sprintf("%s (%i)", state_name, number_of_votes)
             )
