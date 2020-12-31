@@ -4,7 +4,7 @@ library(tibble)
 library(leaflet)
 library(ggplot2)
 
-LAYER_ID <- "us-states"
+#LAYER_ID <- "us-states"
 
 us_states <- readRDS("data/us-states.rds") %>%
     mutate(biden = 0, trump = 0, color = "grey")
@@ -83,7 +83,7 @@ server <- function(input, output, session) {
         if (any(idx_trump)) .appv$us_states[idx_trump, ]$color <- "red"
         
         idx_equal <- .x$biden == .x$trump
-        if (any(idx_equal)) .appv$us_states[idx_equal, ]$color <- "true"
+        if (any(idx_equal)) .appv$us_states[idx_equal, ]$color <- "grey"
         
         leafletProxy("map", data = .appv$us_states) %>%
             clearShapes() %>%
