@@ -43,6 +43,7 @@ server <- function(input, output, session) {
                 color = "white",
                 fillColor = ~ color
                 , layerId = ~ state_name
+                , label = ~ sprintf("%s (%i)", state_name, number_of_votes)
                 #, popup = ~ sprintf("%s (%i)", state_name, number_of_votes)
             ) %>%
             setView(lng = -97.56935, lat = 40.58058, zoom = 4)
@@ -92,6 +93,7 @@ server <- function(input, output, session) {
                 color = "white",
                 fillColor = ~ color
                 , layerId = ~ state_name
+                , label = ~ sprintf("%s (%i)", state_name, number_of_votes)
             )
     })
     
