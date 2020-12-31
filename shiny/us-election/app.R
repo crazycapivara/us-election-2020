@@ -20,8 +20,8 @@ ui <- fluidPage(
         sidebarPanel(
             selectInput("state", "State", choices = us_states$state_name)
             #, sliderInput("test", "test", 0, 100, 0, step = 0.1)
-            , textInput("biden", "Biden %", value = 0)
-            , textInput("trump", "Trump %", value = 0)
+            , textInput("biden", "% Biden", value = 0)
+            , textInput("trump", "% Trump", value = 0)
             , actionButton("update", "Update")
             #, plotOutput("barplot")
         ),
@@ -82,6 +82,9 @@ server <- function(input, output, session) {
         #print(idx_trump)
         if (any(idx_trump)) .appv$us_states[idx_trump, ]$color <- "red"
         
+        idx_equal <- .x$biden == .x$trump
+        if (any(idx_equal)) .appv$us_states[idx_equal, ]$color <- "true"
+        
         leafletProxy("map", data = .appv$us_states) %>%
             clearShapes() %>%
             addPolygons(
@@ -110,8 +113,8 @@ server <- function(input, output, session) {
         tibble(
             State = x$state_name,
             Votes = x$number_of_votes,
-            `Biden %` = x$biden,
-            `Trump %` = x$trump
+            `% Biden` = x$biden,
+            `% Trump` = x$trump
         )
         #x
     })
