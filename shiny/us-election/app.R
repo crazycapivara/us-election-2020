@@ -4,6 +4,8 @@ library(tibble)
 library(leaflet)
 library(ggplot2)
 
+LAYER_ID <- "us-states"
+
 us_states <- readRDS("data/us-states.rds") %>%
     mutate(biden = 0, trump = 0, color = "grey")
 
@@ -64,13 +66,30 @@ server <- function(input, output, session) {
         biden <- as.numeric(input$biden)
         trump <- as.numeric(input$trump)
         state <- input$state
-        print(biden)
-        print(trump)
-        print(state)
+        #print(biden)
+        #print(trump)
+        #print(state)
         .appv$us_states[.appv$us_states$state_name == state, c("biden", "trump")] <- c(biden, trump)
         .appv$votes$Biden <- filter(.appv$us_states, biden > trump)$number_of_votes %>% sum()
         .appv$votes$Trump <- filter(.appv$us_states, trump > biden)$number_of_votes %>% sum()
-        #print(votes_biden)
+        
+        .x <- .appv$us_states
+        idx_biden <- .x$biden > .x$trump
+        #print(idx_biden)
+        if (any(idx_biden)) .appv$us_states[idx_biden, ]$color <- "blue"
+        
+        idx_trump <- .x$biden < .x$trump
+        #print(idx_trump)
+        if (any(idx_trump)) .appv$us_states[idx_trump, ]$color <- "red"
+        
+        leafletProxy("map", data = .appv$us_states) %>%
+            clearShapes() %>%
+            addPolygons(
+                weight = 1,
+                color = "white",
+                fillColor = ~ color
+                , layerId = ~ state_name
+            )
     })
     
     #output$barplot <- renderPlot({
