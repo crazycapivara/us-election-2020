@@ -42,7 +42,8 @@ server <- function(input, output, session) {
                 fillColor = ~ color
                 , layerId = ~ state_name
                 #, popup = ~ sprintf("%s (%i)", state_name, number_of_votes)
-            )
+            ) %>%
+            setView(lng = -97.56935, lat = 40.58058, zoom = 4)
     })
     
     observeEvent(input$state, {
@@ -53,6 +54,7 @@ server <- function(input, output, session) {
     }) 
     
     observeEvent(input$map_shape_click, {
+        print(input$map_shape_click)
         state <- input$map_shape_click$id
         updateSelectInput(session, "state", selected = state)
         print(.appv$us_states)
