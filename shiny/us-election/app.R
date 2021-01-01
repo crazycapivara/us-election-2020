@@ -5,9 +5,13 @@ library(leaflet)
 library(ggplot2)
 
 #LAYER_ID <- "us-states"
+OPACITY <- list(
+    safe = 0.7,
+    leaky = 0.3
+)
 
 us_states <- readRDS("data/us-states.rds") %>%
-    mutate(biden = 0, trump = 0, color = "grey")
+    mutate(biden = 0, trump = 0, color = "grey", opacity = 0.2)
 
 .appv <- reactiveValues(
     us_states = us_states
@@ -22,6 +26,7 @@ ui <- fluidPage(
             #, sliderInput("test", "test", 0, 100, 0, step = 0.1)
             , textInput("biden", "% Biden", value = 0)
             , textInput("trump", "% Trump", value = 0)
+            , selectInput("status", "Status", choices = names(OPACITY))
             , actionButton("update", "Update")
             #, plotOutput("barplot")
         ),
@@ -66,11 +71,13 @@ server <- function(input, output, session) {
     observeEvent(input$update, {
         biden <- as.numeric(input$biden)
         trump <- as.numeric(input$trump)
+        opacity <- OPACITY[[input$status]]
+        #print(opacity)
         state <- input$state
         #print(biden)
         #print(trump)
         #print(state)
-        .appv$us_states[.appv$us_states$state_name == state, c("biden", "trump")] <- c(biden, trump)
+        .appv$us_states[.appv$us_states$state_name == state, c("biden", "trump", "opacity")] <- c(biden, trump, opacity)
         .appv$votes$Biden <- filter(.appv$us_states, biden > trump)$number_of_votes %>% sum()
         .appv$votes$Trump <- filter(.appv$us_states, trump > biden)$number_of_votes %>% sum()
         
@@ -92,6 +99,7 @@ server <- function(input, output, session) {
                 weight = 1,
                 color = "white",
                 fillColor = ~ color
+                , fillOpacity = ~ opacity
                 , layerId = ~ state_name
                 , label = ~ sprintf("%s (%i)", state_name, number_of_votes)
             )
