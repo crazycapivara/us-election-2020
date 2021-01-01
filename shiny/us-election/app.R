@@ -57,8 +57,10 @@ server <- function(input, output, session) {
     observeEvent(input$state, {
         x <- .appv$us_states %>%
             filter(state_name == input$state)
+        status <- ifelse(x$opacity == OPACITY$safe, "safe", "leaky")
         updateTextInput(session, "biden", value = x$biden)
         updateTextInput(session, "trump", value = x$trump)
+        updateSelectInput(session, "status", selected = status)
     }) 
     
     observeEvent(input$map_shape_click, {
