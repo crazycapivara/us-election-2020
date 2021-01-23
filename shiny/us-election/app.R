@@ -11,7 +11,7 @@ OPACITY <- list(
 )
 
 us_states <- readRDS("data/us-states.rds") %>%
-    mutate(biden = 0, trump = 0, color = "grey", opacity = 0.2)
+    mutate(biden = 0, trump = 0, color = "grey", opacity = 0.2, votes = 0)
 
 .appv <- reactiveValues(
     us_states = us_states
@@ -62,6 +62,7 @@ server <- function(input, output, session) {
         updateTextInput(session, "biden", value = x$biden)
         updateTextInput(session, "trump", value = x$trump)
         updateSelectInput(session, "status", selected = status)
+        updateSliderInput(session, "votes", value = x$votes)
     }) 
     
     observeEvent(input$map_shape_click, {
@@ -77,10 +78,11 @@ server <- function(input, output, session) {
         opacity <- OPACITY[[input$status]]
         #print(opacity)
         state <- input$state
+        votes <- input$votes
         #print(biden)
         #print(trump)
         #print(state)
-        .appv$us_states[.appv$us_states$state_name == state, c("biden", "trump", "opacity")] <- c(biden, trump, opacity)
+        .appv$us_states[.appv$us_states$state_name == state, c("biden", "trump", "opacity", "votes")] <- c(biden, trump, opacity, votes)
         .appv$votes$Biden <- filter(.appv$us_states, biden > trump)$number_of_votes %>% sum()
         .appv$votes$Trump <- filter(.appv$us_states, trump > biden)$number_of_votes %>% sum()
         
@@ -127,7 +129,8 @@ server <- function(input, output, session) {
             State = x$state_name,
             Votes = x$number_of_votes,
             `% Biden` = x$biden,
-            `% Trump` = x$trump
+            `% Trump` = x$trump,
+            `% votes` = x$votes
         )
         #x
     })
