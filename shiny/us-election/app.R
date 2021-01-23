@@ -26,6 +26,7 @@ ui <- fluidPage(
             #, sliderInput("test", "test", 0, 100, 0, step = 0.1)
             , textInput("biden", "% Biden", value = 0)
             , textInput("trump", "% Trump", value = 0)
+            , sliderInput("votes", "% votes", min = 0, max = 100, value = 0, step = 1)
             , selectInput("status", "Status", choices = names(OPACITY))
             , actionButton("update", "Update")
             #, plotOutput("barplot")
