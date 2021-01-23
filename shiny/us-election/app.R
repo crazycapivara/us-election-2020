@@ -7,7 +7,7 @@ library(ggplot2)
 #LAYER_ID <- "us-states"
 OPACITY <- list(
     safe = 0.7,
-    leaky = 0.3
+    likely = 0.3
 )
 
 us_states <- readRDS("data/us-states.rds") %>%
@@ -57,7 +57,7 @@ server <- function(input, output, session) {
     observeEvent(input$state, {
         x <- .appv$us_states %>%
             filter(state_name == input$state)
-        status <- ifelse(x$opacity == OPACITY$safe, "safe", "leaky")
+        status <- ifelse(x$opacity == OPACITY$safe, "safe", "likely")
         updateTextInput(session, "biden", value = x$biden)
         updateTextInput(session, "trump", value = x$trump)
         updateSelectInput(session, "status", selected = status)
