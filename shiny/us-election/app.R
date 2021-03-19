@@ -29,6 +29,7 @@ ui <- fluidPage(
             , sliderInput("votes", "% votes", min = 0, max = 100, value = 0, step = 1)
             , selectInput("status", "Status", choices = names(OPACITY))
             , actionButton("update", "Update")
+            , htmlOutput("number_of_votes")
             #, plotOutput("barplot")
         ),
         mainPanel(
@@ -63,6 +64,17 @@ server <- function(input, output, session) {
         updateTextInput(session, "trump", value = x$trump)
         updateSelectInput(session, "status", selected = status)
         updateSliderInput(session, "votes", value = x$votes)
+        # NEW OUTPUT
+        #print(x)
+        number_of_votes <- x$number_of_votes * 1000000L * x$votes / 100
+        nof_biden <- number_of_votes * x$biden / 100
+        nof_trump <- number_of_votes * x$trump / 100
+        nof_diff <- abs(nof_biden - nof_trump)
+        txt = glue::glue("
+            <p>Ausgezaehlt: {number_of_votes}</p>
+            <p>biden: {nof_biden}, trump: {nof_trump} ({nof_diff})</p>
+        ")
+        output$number_of_votes <- renderText(txt)
     }) 
     
     observeEvent(input$map_shape_click, {
