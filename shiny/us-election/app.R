@@ -29,7 +29,8 @@ ui <- fluidPage(
             , sliderInput("votes", "% votes", min = 0, max = 100, value = 0, step = 1)
             , selectInput("status", "Status", choices = names(OPACITY))
             , actionButton("update", "Update")
-            , htmlOutput("number_of_votes")
+            , htmlOutput("number_of_votes",
+                         style = "background: white; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid grey;")
             #, plotOutput("barplot")
         ),
         mainPanel(
@@ -64,31 +65,22 @@ server <- function(input, output, session) {
         updateTextInput(session, "trump", value = x$trump)
         updateSelectInput(session, "status", selected = status)
         updateSliderInput(session, "votes", value = x$votes)
-        # NEW OUTPUT
-        #print(x)
-        render_nof(x)
-        #number_of_votes <- x$number_of_votes * 1000000 * x$votes / 100
-        #nof_biden <- number_of_votes * x$biden / 100
-        #nof_trump <- number_of_votes * x$trump / 100
-        #nof_diff <- abs(nof_biden - nof_trump)
-        #txt = glue::glue("
-        #    <p>Ausgezaehlt: {number_of_votes}</p>
-        #    <p>biden: {nof_biden}, trump: {nof_trump} ({nof_diff})</p>
-        #")
-        #output$number_of_votes <- renderText(txt)
     }) 
     
-    render_nof <- function(x) {
+    output$number_of_votes <- renderText({
+        x <- .appv$us_states %>%
+            filter(state_name == input$state)
         number_of_votes <- x$number_of_votes * 1000000L * x$votes / 100
         nof_biden <- number_of_votes * x$biden / 100
         nof_trump <- number_of_votes * x$trump / 100
         nof_diff <- abs(nof_biden - nof_trump)
-        txt = glue::glue("
-            <p>Ausgezaehlt: {number_of_votes}</p>
-            <p>biden: {nof_biden}, trump: {nof_trump} ({nof_diff})</p>
+        txt <- glue::glue("
+            <p>Ausgezählt: {number_of_votes}</p>
+            <p>Biden: {nof_biden}, Trump: {nof_trump}</p>
+            <p>Differenz: {nof_diff}</p>
         ")
-        output$number_of_votes <- renderText(txt)
-    }
+         txt
+    })
     
     observeEvent(input$map_shape_click, {
         print(input$map_shape_click)
