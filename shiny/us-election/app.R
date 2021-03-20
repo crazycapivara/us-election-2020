@@ -74,11 +74,10 @@ server <- function(input, output, session) {
         nof_biden <- number_of_votes * x$biden / 100
         nof_trump <- number_of_votes * x$trump / 100
         nof_diff <- abs(nof_biden - nof_trump)
-        txt <- glue::glue("
-            <p>Ausgezählt: {number_of_votes}</p>
+        txt <- paste0(sprintf("<p>Ausgezählt: %i</p>", number_of_votes), glue::glue("
             <p>Biden: {nof_biden}, Trump: {nof_trump}</p>
             <p>Differenz: {nof_diff}</p>
-        ")
+        "))
          txt
     })
     
