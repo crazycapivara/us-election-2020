@@ -66,6 +66,19 @@ server <- function(input, output, session) {
         updateSliderInput(session, "votes", value = x$votes)
         # NEW OUTPUT
         #print(x)
+        render_nof(x)
+        #number_of_votes <- x$number_of_votes * 1000000 * x$votes / 100
+        #nof_biden <- number_of_votes * x$biden / 100
+        #nof_trump <- number_of_votes * x$trump / 100
+        #nof_diff <- abs(nof_biden - nof_trump)
+        #txt = glue::glue("
+        #    <p>Ausgezaehlt: {number_of_votes}</p>
+        #    <p>biden: {nof_biden}, trump: {nof_trump} ({nof_diff})</p>
+        #")
+        #output$number_of_votes <- renderText(txt)
+    }) 
+    
+    render_nof <- function(x) {
         number_of_votes <- x$number_of_votes * 1000000L * x$votes / 100
         nof_biden <- number_of_votes * x$biden / 100
         nof_trump <- number_of_votes * x$trump / 100
@@ -75,7 +88,7 @@ server <- function(input, output, session) {
             <p>biden: {nof_biden}, trump: {nof_trump} ({nof_diff})</p>
         ")
         output$number_of_votes <- renderText(txt)
-    }) 
+    }
     
     observeEvent(input$map_shape_click, {
         print(input$map_shape_click)
